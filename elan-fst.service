@@ -1,0 +1,10 @@
+#/etc/systemd/system/elan-fst.service
+[Unit]
+Description=elan-fst
+
+[Service]
+ExecStart=/var/www/elan-fst/start_flask.sh
+User=www-data
+
+[Install]
+WantedBy=multi-user.target
