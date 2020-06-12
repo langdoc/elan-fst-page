@@ -4,11 +4,11 @@ import os
 
 app = Flask(__name__)
 
-@app.route('/')  
+@app.route('/elan-fst/')  
 def upload():  
     return render_template("file_upload_form.html")  
 
-@app.route('/success', methods = ['POST'])  
+@app.route('/elan-fst/success/', methods = ['POST'])  
 def success():  
     if request.method == 'POST':  
         f = request.files['file']  
@@ -35,7 +35,7 @@ def success():
 
         return render_template("success.html", name = f.filename, table = table)  
 
-@app.route('/return-files/')
+@app.route('/elan-fst/return-files/')
 def return_files():
     try:
 #        f = request.files['file']
@@ -44,7 +44,7 @@ def return_files():
         return str(e)
 
 if __name__ == '__main__':  
-    app.run(debug = True)
+    app.run()
 
 #@app.route("/", methods=['POST'])
 #elan_file_path = sys.argv[1]
