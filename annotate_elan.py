@@ -21,15 +21,15 @@ def success():
 
         if tier_structure == 'freiburg':
 
-               cg = Cg3("kpv")
-               elan_annotated = annotate_freiburg(root, cg = cg)
-               ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
+            cg = Cg3("kpv")
+            elan_annotated = annotate_freiburg(root, cg = cg)
+            ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
 
         if tier_structure == 'oulu':
 
-               cg = Cg3("smn")
-               elan_annotated = annotate_oulu(root, cg = cg)
-               ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
+            cg = Cg3("smn")
+            elan_annotated = annotate_oulu(root, cg = cg)
+            ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
 
         table = print_unknown_words("temp.eaf")
 
