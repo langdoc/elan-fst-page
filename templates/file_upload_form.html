@@ -4,8 +4,10 @@
 </head>
 <body> 
     <h1>ELAN annotation pipeline</h1> 
-    <p>This online version of the annotation tool is developed by Niko Partanen, and it runs in CSC's cPouta infrastructure. The tool is based to collaboration and contributions of Ciprian Gerstenberger, Niko Partanen, Iris Perkmann, Michael Rießler and Joshua Wilbur. Further documentation of the pipeline is available <a href="https://github.com/langdoc/elan-fst">here</a>.</p>
-    <form action = "/success" method = "post" enctype="multipart/form-data">  
+    <p>This online version of the annotation tool is developed by Niko Partanen, and it runs in CSC's cPouta infrastructure. The tool is based to collaboration and contributions of Ciprian Gerstenberger, Niko Partanen, Mika Hämäläinen, Iris Perkmann, Michael Rießler and Joshua Wilbur. Further documentation of the pipeline is available <a href="https://github.com/langdoc/elan-fst">here</a>.</p>
+    <p>This annotation tool works with ELAN files that follow the standards used in projects associated with the Freiburg Research Group in Saami Studies, and in Giellagas Institute for Saami Studies in the University of Oulu.</p>
+    <p>The files are first validated, and the files have to follow one of those structures. Customizing the tool according to a new template is also possible.</p>
+    <form action = "{{ url_for('success') }}" method = "post" enctype="multipart/form-data">  
         <input type="file" name="file" />  
         <input type = "submit" value="Process">  
     </form> 

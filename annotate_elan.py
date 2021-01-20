@@ -2,40 +2,40 @@ from flask import *
 from elan_fst import *
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 @app.route('/elan-fst/')  
 def upload():  
     return render_template("file_upload_form.html")  
 
-@app.route('/elan-fst/success/', methods = ['POST'])  
+@app.route('/elan-fst/success', methods = ['GET', 'POST'])  
 def success():  
-    if request.method == 'POST':  
-        f = request.files['file']  
 
-        elan_xml = f.stream.read().decode("utf-8")
+    f = request.files['file']  
 
-        root = ET.fromstring(elan_xml)
+    elan_xml = f.stream.read().decode("utf-8")
 
-        tier_structure = detect_tier_structure(root)
+    root = ET.fromstring(elan_xml)
 
-        if tier_structure == 'freiburg':
+    tier_structure = detect_tier_structure(root)
 
-               cg = Cg3("kpv")
-               elan_annotated = annotate_freiburg(root, cg = cg)
-               ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
+    if tier_structure == 'freiburg':
 
-        if tier_structure == 'oulu':
+        cg = Cg3("kpv")
+        elan_annotated = annotate_freiburg(root, cg = cg)
+        ET.ElementTree(elan_annotated).write(f"temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
 
-               cg = Cg3("smn")
-               elan_annotated = annotate_oulu(root, cg = cg)
-               ET.ElementTree(elan_annotated).write("temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
+    if tier_structure == 'oulu':
 
-        table = print_unknown_words("temp.eaf")
+        cg = Cg3("smn")
+        elan_annotated = annotate_oulu(root, cg = cg)
+        ET.ElementTree(elan_annotated).write(f"temp.eaf", xml_declaration=True, encoding='utf-8', method="xml")
 
-        return render_template("success.html", name = f.filename, table = table)  
+    table = print_unknown_words("temp.eaf")
 
-@app.route('/elan-fst/return-files/')
+    return render_template("success.html", name = f.filename, table = table)  
+
+@app.route('/elan-fst/return-files')
 def return_files():
     try:
 #        f = request.files['file']
@@ -44,7 +44,7 @@ def return_files():
         return str(e)
 
 if __name__ == '__main__':  
-    app.run()
+    app.run(host = '193.167.189.183/')
 
 #@app.route("/", methods=['POST'])
 #elan_file_path = sys.argv[1]
