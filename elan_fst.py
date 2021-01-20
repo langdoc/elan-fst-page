@@ -32,7 +32,7 @@ def get_elan_info(root, orig_tier_part = 'orth'):
 
 def check_tiers_with_type(root, tier_type):
 
-    for tier in root.findall(".//TIER[@LINGUISTIC_TYPE_REF='{tier_types}']"):
+    for tier in root.findall(f".//TIER[@LINGUISTIC_TYPE_REF='{tier_types}']"):
 
         root.remove(tier)
             
@@ -50,18 +50,38 @@ def get_last_tier_position(root):
 
     return(max(tier_positions))
 
+def remove_tier_type(root, tier_type):
+    
+    tier = root.find(f".//TIER[@TIER_ID='{tier_type}']")
+    
+    if tier:
+        
+        root.remove(tier)
+        
+    return(root)
+
 def tokenize_elan(root, target_type = 'word token', orig_tier_part = 'orth', new_tier_part = 'word', process = word_tokenize):
     
     transcription_tiers, max_id = get_elan_info(root, orig_tier_part)
     
     for tier in transcription_tiers:
-
+        
+        if re.match(r"(lemma|pos|syntax|morph)", tier['tier_id']):
+            
+            root = remove_tier_type(root, tier['tier_id'])
+        
         word_tier_id = tier['tier_id'].replace(orig_tier_part, new_tier_part)
 
-        #new_word_tier = ET.Element('TIER', DEFAULT_LOCALE='en', LINGUISTIC_TYPE_REF=target_type, PARENT_REF=tier['tier_id'], TIER_ID = word_tier_id)
         word_tier = root.find(f".//TIER[@TIER_ID='{word_tier_id}']")
-        
-        root.remove(word_tier)
+
+        if word_tier:
+
+            root.remove(word_tier)
+            word_tier = ET.Element('TIER', DEFAULT_LOCALE='en', LINGUISTIC_TYPE_REF=target_type, PARENT_REF=tier['tier_id'], TIER_ID = word_tier_id)
+
+        else:
+
+            word_tier = ET.Element('TIER', DEFAULT_LOCALE='en', LINGUISTIC_TYPE_REF=target_type, PARENT_REF=tier['tier_id'], TIER_ID = word_tier_id)
 
         for annotations in tier['annotations']:
 
@@ -69,27 +89,29 @@ def tokenize_elan(root, target_type = 'word token', orig_tier_part = 'orth', new
             annotation_ref = annotations[0]
 
             for position, word in enumerate(process(transcription)):
+                
+                if word:
 
-                annotation = ET.Element("ANNOTATION")
+                    annotation = ET.Element("ANNOTATION")
 
-                if position == 0:
+                    if position == 0:
 
-                    ref_annotation = ET.Element("REF_ANNOTATION", ANNOTATION_ID = f'a{str(max_id)}', ANNOTATION_REF = f'{annotation_ref}')
+                        ref_annotation = ET.Element("REF_ANNOTATION", ANNOTATION_ID = f'a{str(max_id)}', ANNOTATION_REF = f'{annotation_ref}')
 
-                else:
+                    else:
 
-                    ref_annotation = ET.Element("REF_ANNOTATION", ANNOTATION_ID = f'a{str(max_id)}', ANNOTATION_REF = f'{annotation_ref}', PREVIOUS_ANNOTATION = f'a{str(max_id - 1)}')
+                        ref_annotation = ET.Element("REF_ANNOTATION", ANNOTATION_ID = f'a{str(max_id)}', ANNOTATION_REF = f'{annotation_ref}', PREVIOUS_ANNOTATION = f'a{str(max_id - 1)}')
 
-                annotation_value = ET.Element("ANNOTATION_VALUE")
-                annotation_value.text = word
+                    annotation_value = ET.Element("ANNOTATION_VALUE")
+                    annotation_value.text = word
 
-                ref_annotation.insert(len(ref_annotation), annotation_value)
+                    ref_annotation.insert(len(ref_annotation), annotation_value)
 
-                annotation.insert(len(annotation), ref_annotation)
+                    annotation.insert(len(annotation), ref_annotation)
 
-                word_tier.insert(len(word_tier), annotation)
+                    word_tier.insert(len(word_tier), annotation)
 
-                max_id += 1
+                    max_id += 1
                 
         position = get_last_tier_position(root)
 
@@ -316,14 +338,14 @@ def detect_tier_structure(root):
 
 def annotate_freiburg(root, cg):
 
-    elan_tokenized = tokenize_elan(root)
+    elan_tokenized = tokenize_elan(root, target_type = "wordT")
     elan_annotated = annotate_elan(elan_tokenized, cg = cg, orig_tier_part = 'word@', lemma_tier_part = 'lemma@', pos_tier_part = 'pos@', morph_tier_part = 'morph@', syntax_tier_part = 'syntax@', syntax = False)
 
     return(elan_annotated)
 
 def annotate_oulu(root, cg):
 
-    elan_tokenized = tokenize_elan(root)
+    elan_tokenized = tokenize_elan(root, target_type = 'word token')
     elan_annotated = annotate_elan(elan_tokenized, cg = cg, orig_tier_part = 'word', lemma_tier_part = 'lemma', pos_tier_part = 'pos', morph_tier_part = 'morph', syntax_tier_part = 'syntax', syntax = True)
 
     return(elan_annotated)
