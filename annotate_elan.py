@@ -39,7 +39,7 @@ def success():
 def return_files():
     try:
 #        f = request.files['file']
-        return send_file('temp.eaf',  mimetype='application/xml', attachment_filename="test.eaf", as_attachment=True)
+        return send_file('temp.eaf',  mimetype='application/xml', attachment_filename="elan_with_annotations.eaf", as_attachment=True)
     except Exception as e:
         return str(e)
 

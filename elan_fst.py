@@ -4,7 +4,7 @@ from operator import itemgetter
 import re
 from uralicNLP.cg3 import Cg3
 
-def get_elan_info(root, orig_tier_part = 'orth'):
+def get_elan_info(root, orig_tier_identifier = 'orth'):
 
     transcription_tiers = []
 
@@ -12,7 +12,7 @@ def get_elan_info(root, orig_tier_part = 'orth'):
 
     for tier in root.findall(".//TIER"):
 
-        if orig_tier_part in tier.get('TIER_ID'):
+        if orig_tier_identifier in tier.get('TIER_ID'):
 
             tier_info = {}
 
@@ -60,9 +60,9 @@ def remove_tier_type(root, tier_type):
         
     return(root)
 
-def tokenize_elan(root, target_type = 'word token', orig_tier_part = 'orth', new_tier_part = 'word', process = word_tokenize):
+def tokenize_elan(root, target_type = 'word token', orig_tier_identifier = 'orth@', orig_tier_part = 'orth', new_tier_part = 'word', process = word_tokenize):
     
-    transcription_tiers, max_id = get_elan_info(root, orig_tier_part)
+    transcription_tiers, max_id = get_elan_info(root, orig_tier_identifier)
     
     for tier in transcription_tiers:
         
@@ -87,6 +87,10 @@ def tokenize_elan(root, target_type = 'word token', orig_tier_part = 'orth', new
 
             transcription = annotations[1]
             annotation_ref = annotations[0]
+
+            if not transcription:
+
+                transcription = '_'
 
             for position, word in enumerate(process(transcription)):
                 
